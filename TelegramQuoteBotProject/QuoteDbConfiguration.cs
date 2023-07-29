@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 namespace TelegramQuoteBotProject;
 
 
-public static class Parsing
+public static class QuoteDbConfiguration
 {
 
     public static void ParseIntoQuoteDb(string url, models.TelegramQuoteDbContext context)
@@ -105,6 +105,35 @@ public static class Parsing
                 }
             }
         }
+
+        context.SaveChanges();
+    }
+
+    public static void ResetUsedField(models.TelegramQuoteDbContext context)
+    {
+        if (context.Quotes.Any())
+            foreach (var quote in context.Quotes)
+            {
+                if(quote.Used != 0) quote.Used = 0;
+            }
+
+        context.SaveChanges();
+    }
+    
+    public static void FillUsedField(models.TelegramQuoteDbContext context)
+    {
+        var i = 2;
+        if (context.Quotes.Any())
+            foreach (var quote in context.Quotes)
+            {
+                if (i > 0)
+                {
+                    i--;
+                    quote.Used = 0;
+                    continue;
+                }
+                if(quote.Used != 1) quote.Used = 1;
+            }
 
         context.SaveChanges();
     }

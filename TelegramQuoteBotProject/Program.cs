@@ -3,12 +3,11 @@
 namespace TelegramQuoteBotProject;
 
 
-//TODO:     1. ADD QUOTES INTO SENDING
-//TODO:     2. CHANGE USED COLUMN
 //TODO:     3. MAKE FINAL DIALOG
-//TODO:     4. ERROR WITH USER'S DELETING CHAT
 //TODO:     5. CHANGE/DELETE CODE FOR TESTING
-//TODO:     5. MAKE RESETTING USED COLUMN FUNCTION
+//TODO:     8. ECHO @all FUNCTION
+//TODO:     9. LOGGING
+//TODO:     9. MOMENT WITH BLOCKING BOT
 
 
 public static class Program
@@ -23,8 +22,10 @@ public static class Program
         
         var connectionString = config.GetSection("ConnectionStrings")["QuoteDBConnection"];
         var enableParsing = config.GetSection("Parsing")["EnableParsing"]?.ToLower();
+        var enableResetUsedField = config["UsedReset"]?.ToLower();
+        var enableFillUsedField = config["UsedFill"]?.ToLower();
         var telegramToken = config["TelegramToken"];
-
+        var cronTimeExpression = config["CronTimeExpression"];
 
         using var context = new models.TelegramQuoteDbContext(connectionString!);
 
@@ -33,25 +34,60 @@ public static class Program
             try
             {
                 var url = config.GetSection("Parsing")["Url"];
-                if (url != null) Parsing.ParseIntoQuoteDb(url, context);
+                if (url != null)
+                {
+                    QuoteDbConfiguration.ParseIntoQuoteDb(url, context);
+                    Console.WriteLine("Parsing successful!");
+                }
                 else Console.WriteLine("Empty Url!");
+                return;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception Caught: {ex.Message}");
+                return;
             }
         }
 
-
-        if (telegramToken != null)
+        if (enableResetUsedField?.Equals("true") ?? false)
         {
             try
             {
-                TgBot.TgBotStart(context, telegramToken);
+                QuoteDbConfiguration.ResetUsedField(context);
+                Console.WriteLine("Reset Used Field successful!");
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception Caught: {ex.Message}");
+                return;
+            }
+        }
+        
+        if (enableFillUsedField?.Equals("true") ?? false)
+        {
+            try
+            {
+                QuoteDbConfiguration.FillUsedField(context);
+                Console.WriteLine("Fill Used Field successful!");
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception Caught: {ex.Message}");
+                return;
+            }
+        }
+        
+        if (telegramToken is { Length: > 0 } && cronTimeExpression is { Length: > 0 })
+        {
+            try
+            {
+                TgBot.TgBotStart(context, telegramToken, cronTimeExpression);
             }
             catch(Exception ex) { Console.WriteLine($"Exception: {ex}, Message: {ex.Message}"); }
         }
-        else Console.WriteLine("Empty Telegram Token!");
+        else Console.WriteLine("Empty Configuration!");
         
     }
     
