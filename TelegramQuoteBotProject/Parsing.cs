@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+
 namespace TelegramQuoteBotProject;
 
 
@@ -107,28 +108,5 @@ public static class Parsing
 
         context.SaveChanges();
     }
-    
-}
-
-
-{
-"Logging": {
-    "LogLevel": {
-        "Default": "Debug",
-        "System": "Information",
-        "Microsoft": "Information"
-    }
-},
-    
-"ConnectionStrings": {
-    "QuoteDbConnection": "Data Source=D:/JetBrains/JetBrains Rider 2023.1.3/RiderProjects/TelegramQuoteBot/TelegramQuoteBotProject/src/dbs/TelegramQuoteDb.db"
-},
-    
-"Parsing": {
-    "EnableParsing": "false",
-    "Url": "https://www.forbes.ru/forbeslife/dosug/262327-na-vse-vremena-100-vdokhnovlyayushchikh-tsitat"
-},
-    
-"TelegramToken": "6363155135:AAFNUy8TBNZULBzx3Fckl8KbLreJTU2CRt0"
     
 }
